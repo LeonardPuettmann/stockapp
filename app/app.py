@@ -7,8 +7,8 @@ import yfinance as yf
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
-from app.sentiment import get_news, get_sentiment
-from app.predict import predict_price
+from sentiment import get_news, get_sentiment
+from predict import predict_price
 
 # load Bert model
 tokenizer = AutoTokenizer.from_pretrained('zhayunduo/roberta-base-stocktwits-finetuned')
