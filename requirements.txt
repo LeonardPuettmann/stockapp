@@ -4,3 +4,4 @@ yfinance==0.1.70
 transformers==4.18.0
 xgboost==1.6.1
 scikit-learn==1.0.2
+plotly==5.8.0
