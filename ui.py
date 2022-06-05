@@ -1,16 +1,11 @@
 import streamlit as st
-
 import plotly.graph_objects as go
 import numpy as np
 import pandas as pd
 import datetime
-import cufflinks as cf
 import yfinance as yf
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
-import torch
-from urllib.request import urlopen, Request
-from bs4 import BeautifulSoup
 
 from sentiment import get_news, get_sentiment
 from predict import predict_price

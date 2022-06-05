@@ -4,7 +4,6 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 import numpy as np
 import pandas as pd
 import xgboost as xgb
-import matplotlib.pyplot as plt
 import yfinance as yf
 import pickle
 import time
