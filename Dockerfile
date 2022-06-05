@@ -1,7 +1,7 @@
 FROM python:3.9
 
-WORKDIR /app
-COPY . /app
+WORKDIR app/
+COPY ./app .
 
 RUN apt-get update
 RUN python -m pip install --upgrade pip
