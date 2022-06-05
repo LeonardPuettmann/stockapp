@@ -46,7 +46,7 @@ if sum(values) >= 14:
     col1.metric('Sentiment score', f'{(sum(values) * 5) - 5} %', 'Great')
 
 elif sum(values) >= 7:
-    col1.metric('Sentiment score', f'{sum(values) * 5} %', 'Alright')
+    col1.metric('Sentiment score', f'{sum(values) * 5} %', 'Medium')
 
 else:
     col1.metric('Sentiment score', f'{sum(values) * 5} %', 'Bad')
