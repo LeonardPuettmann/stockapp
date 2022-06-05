@@ -1,0 +1,9 @@
+
+name: stockapp
+services:
+- dockerfile_path: Dockerfile
+  github:
+    branch: main
+    deploy_on_push: true
+    repo: LeonardPuettmann/stockapp
+  name: stockapp

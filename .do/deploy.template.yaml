@@ -1,0 +1,8 @@
+spec:
+  name: stockapp
+  services:
+  - dockerfile_path: Dockerfile
+    git:
+      branch: main
+      repo_clone_url: git@github.com:LeonardPuettmann/stockapp.git
+    name: stockapp
