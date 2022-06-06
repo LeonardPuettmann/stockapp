@@ -10,5 +10,5 @@ RUN python3 -c "from transformers import AutoTokenizer; tokenizer = AutoTokenize
 
 EXPOSE 80
 ENTRYPOINT ["streamlit", "run"] 
-CMD ["app.py", "--server.port 80"]
+CMD ["app.py", "--server.port", "80"]
 
