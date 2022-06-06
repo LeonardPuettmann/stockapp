@@ -1,4 +1,5 @@
 import pandas as pd
+import torch
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from urllib.request import urlopen, Request
