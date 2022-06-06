@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import datetime
 import yfinance as yf
+from operator import attrgetter
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
@@ -15,10 +16,18 @@ from predict import predict_price
 tokenizer = AutoTokenizer.from_pretrained('zhayunduo/roberta-base-stocktwits-finetuned')
 model = AutoModelForSequenceClassification.from_pretrained('zhayunduo/roberta-base-stocktwits-finetuned')
 
+
 # Sidebar
 st.sidebar.subheader('Query parameters')
+
+# Get current date
+attrs = ('year', 'month', 'day')
+now = datetime.datetime.today()
+today = attrgetter(*attrs)(now)
+
+# Preset interval for the date
 start_date = st.sidebar.date_input("Start date", datetime.date(2019, 1, 1))
-end_date = st.sidebar.date_input("End date", datetime.date(2022, 5, 31))
+end_date = st.sidebar.date_input("End date", now)
 
 # Ticker data
 ticker_list = pd.read_csv('snp500.txt')
@@ -31,8 +40,8 @@ news, date = get_news(ticker_symbol)
 sentiment, values = get_sentiment(news, model, tokenizer)
 
 # Ticker information
-string_logo = '<img src=%s>' % ticker_data.info['logo_url']
-st.markdown(string_logo, unsafe_allow_html=True)
+#string_logo = '<img src=%s>' % ticker_data.info['logo_url']
+#st.markdown(string_logo, unsafe_allow_html=True)
 string_name = ticker_data.info['longName']
 st.header('**%s**' % string_name)
 
@@ -45,12 +54,7 @@ fig = go.Figure(data=go.Ohlc(x=ticker_df.index,
                     increasing_line_color= 'lightgreen', 
                     decreasing_line_color= 'lightcoral'))
 
-fig.update_layout(
-    autosize=False,
-    width=800,
-    height=500,)
-
-st.plotly_chart(fig, use_container_width=False)
+st.plotly_chart(fig, use_container_width=True)
 
 # Print overall metrics
 st.subheader('Metrics for this stock')
@@ -72,17 +76,14 @@ else:
 price_pred = predict_price(ticker_symbol)
 rounded_price = round(int(price_pred), 2)
 last_close = ticker_df.Close[-1] 
+rounded_last_close = round(last_close, 2)
 delta = price_pred - last_close
 col2.metric('Price prediction', f'{rounded_price} USD', round(delta, 2))
 
 # Indicator for suistainability
-score = ticker_data.sustainability.loc['totalEsg'].values
-if score <= 25:
-    col3.metric('ESG Score', score[0], 'Great')
-elif score <= 50:
-    col3.metric('ESG Score', score[0], 'Medium', delta_color='off')
-else: 
-    col3.metric('ESG Score', score[0], 'Horrible')
+week_price = ticker_df.Close[-5]
+week_delta = last_close - week_price
+col3.metric('Current Price', f'{rounded_last_close} USD', round(week_delta, 2))
 
 # Print current news and sentiment
 st.subheader('Current news and sentiments')
