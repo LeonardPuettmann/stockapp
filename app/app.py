@@ -19,7 +19,7 @@ model = AutoModelForSequenceClassification.from_pretrained('zhayunduo/roberta-ba
 # Sidebar
 st.sidebar.subheader('Query parameters')
 start_date = st.sidebar.date_input("Start date", datetime.date(2019, 1, 1))
-end_date = st.sidebar.date_input("End date", datetime.today().strftime('%Y-%m-%d'))
+end_date = st.sidebar.date_input("End date", datetime.date(2022, 5, 31))
 
 # Ticker data
 ticker_list = pd.read_csv('snp500.txt')
