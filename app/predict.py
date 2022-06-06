@@ -10,7 +10,6 @@ import time
 
 from xgboost import plot_importance, plot_tree
 
-
 def predict_price(ticker):
     try:
 
