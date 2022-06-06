@@ -4,7 +4,7 @@ WORKDIR /app
 COPY ./app .
 
 RUN apt-get update
-RUN pip3 install torch --extra-index-url https://download.pytorch.org/whl/cpu
+RUN pip3 install torch
 RUN python3 -m pip install -r requirements.txt
 
 EXPOSE 8501
