@@ -18,7 +18,7 @@ model = AutoModelForSequenceClassification.from_pretrained('zhayunduo/roberta-ba
 
 # Sidebar
 st.sidebar.subheader('Query parameters')
-start_date = st.sidebar.date_input("Start date", datetime.date(2020, 1, 1))
+start_date = st.sidebar.date_input("Start date", datetime.date(2020, 01, 1))
 end_date = st.sidebar.date_input("End date", datetime.today().strftime('%Y-%m-%d'))
 
 # Ticker data
