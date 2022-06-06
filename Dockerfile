@@ -9,6 +9,5 @@ RUN python3 -m pip install -r requirements.txt
 RUN python3 -c "from transformers import AutoTokenizer; tokenizer = AutoTokenizer.from_pretrained('zhayunduo/roberta-base-stocktwits-finetuned')"
 
 EXPOSE 80
-ENTRYPOINT ["streamlit", "run"]
-CMD ["app.py", "--server.port" "80"]
+CMD ["streamlit", "run", "app.py", "--server.port" "80"]
 
