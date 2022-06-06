@@ -8,6 +8,7 @@ RUN pip3 install torch --extra-index-url https://download.pytorch.org/whl/cpu
 RUN python3 -m pip install -r requirements.txt
 RUN python3 -c "from transformers import AutoTokenizer; tokenizer = AutoTokenizer.from_pretrained('zhayunduo/roberta-base-stocktwits-finetuned')"
 
-EXPOSE 80
-CMD ["streamlit", "run", "app.py", "--server.port" "80"]
+EXPOSE 8501
+ENTRYPOINT ["streamlit", "run"]
+CMD ["app.py"]
 
