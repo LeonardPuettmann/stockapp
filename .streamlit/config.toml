@@ -1,8 +1,10 @@
 [server]
 headless = true
 port = 80
+
 [browser]
 serverAddress = “www.turtleshell.io”
+
 [theme]
 primaryColor="#82E0AA"
 backgroundColor="#FFFFFF"
