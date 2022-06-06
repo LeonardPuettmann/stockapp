@@ -1,8 +1,10 @@
+from lib2to3.pgen2 import token
 import streamlit as st
 import plotly.graph_objects as go
 import numpy as np
 import pandas as pd
 import datetime
+from datetime import datetime
 import yfinance as yf
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
@@ -11,13 +13,18 @@ from sentiment import get_news, get_sentiment
 from predict import predict_price
 
 # load Bert model
-tokenizer = AutoTokenizer.from_pretrained('zhayunduo/roberta-base-stocktwits-finetuned')
-model = AutoModelForSequenceClassification.from_pretrained('zhayunduo/roberta-base-stocktwits-finetuned')
+@st.cache
+def get_model():
+    tokenizer = AutoTokenizer.from_pretrained('zhayunduo/roberta-base-stocktwits-finetuned')
+    model = AutoModelForSequenceClassification.from_pretrained('zhayunduo/roberta-base-stocktwits-finetuned')
+    return tokenizer, model
+
+tokenizer, model = get_model()
 
 # Sidebar
 st.sidebar.subheader('Query parameters')
-start_date = st.sidebar.date_input("Start date", datetime.date(2019, 1, 1))
-end_date = st.sidebar.date_input("End date", datetime.date(2022, 5, 31))
+start_date = st.sidebar.date_input("Start date", datetime.date(2020, 1, 1))
+end_date = st.sidebar.date_input("End date", datetime.today().strftime('%Y-%m-%d'))
 
 # Ticker data
 ticker_list = pd.read_csv('snp500.txt')
@@ -34,6 +41,22 @@ string_logo = '<img src=%s>' % ticker_data.info['logo_url']
 st.markdown(string_logo, unsafe_allow_html=True)
 string_name = ticker_data.info['longName']
 st.header('**%s**' % string_name)
+
+# Plot with ploly
+fig = go.Figure(data=go.Ohlc(x=ticker_df.index,
+                    open=ticker_df['Open'],
+                    high=ticker_df['High'],
+                    low=ticker_df['Low'],
+                    close=ticker_df['Close'],
+                    increasing_line_color= 'lightgreen', 
+                    decreasing_line_color= 'lightcoral'))
+
+fig.update_layout(
+    autosize=False,
+    width=800,
+    height=500,)
+
+st.plotly_chart(fig, use_container_width=False)
 
 # Print overall metrics
 st.subheader('Metrics for this stock')
@@ -66,22 +89,6 @@ elif score <= 50:
     col3.metric('ESG Score', score[0], 'Medium', delta_color='off')
 else: 
     col3.metric('ESG Score', score[0], 'Horrible')
-
-# Plot with ploly
-fig = go.Figure(data=go.Ohlc(x=ticker_df.index,
-                    open=ticker_df['Open'],
-                    high=ticker_df['High'],
-                    low=ticker_df['Low'],
-                    close=ticker_df['Close'],
-                    increasing_line_color= 'lightgreen', 
-                    decreasing_line_color= 'lightcoral'))
-
-fig.update_layout(
-    autosize=False,
-    width=800,
-    height=500,)
-
-st.plotly_chart(fig, use_container_width=False)
 
 # Print current news and sentiment
 st.subheader('Current news and sentiments')
