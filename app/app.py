@@ -13,13 +13,8 @@ from sentiment import get_news, get_sentiment
 from predict import predict_price
 
 # load Bert model
-@st.cache
-def get_model():
-    tokenizer = AutoTokenizer.from_pretrained('zhayunduo/roberta-base-stocktwits-finetuned')
-    model = AutoModelForSequenceClassification.from_pretrained('zhayunduo/roberta-base-stocktwits-finetuned')
-    return tokenizer, model
-
-tokenizer, model = get_model()
+tokenizer = AutoTokenizer.from_pretrained('zhayunduo/roberta-base-stocktwits-finetuned')
+model = AutoModelForSequenceClassification.from_pretrained('zhayunduo/roberta-base-stocktwits-finetuned')
 
 # Sidebar
 st.sidebar.subheader('Query parameters')
