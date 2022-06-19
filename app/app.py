@@ -16,7 +16,6 @@ from predict import predict_price
 tokenizer = AutoTokenizer.from_pretrained('zhayunduo/roberta-base-stocktwits-finetuned')
 model = AutoModelForSequenceClassification.from_pretrained('zhayunduo/roberta-base-stocktwits-finetuned')
 
-
 # Sidebar
 st.sidebar.subheader('Query parameters')
 
@@ -40,24 +39,11 @@ news, date = get_news(ticker_symbol)
 sentiment, values = get_sentiment(news, model, tokenizer)
 
 # Ticker information
-#string_logo = '<img src=%s>' % ticker_data.info['logo_url']
-#st.markdown(string_logo, unsafe_allow_html=True)
+string_logo = '<img src=%s>' % ticker_data.info['logo_url']
+st.markdown(string_logo, unsafe_allow_html=True)
+
 string_name = ticker_data.info['longName']
 st.header('**%s**' % string_name)
-
-# Plot with ploly
-fig = go.Figure(data=go.Ohlc(x=ticker_df.index,
-                    open=ticker_df['Open'],
-                    high=ticker_df['High'],
-                    low=ticker_df['Low'],
-                    close=ticker_df['Close'],
-                    increasing_line_color= 'lightgreen', 
-                    decreasing_line_color= 'lightcoral'))
-
-st.plotly_chart(fig, use_container_width=True)
-
-# Print overall metrics
-st.subheader('Metrics for this stock')
 
 # Indicator for enviromental, social and governance score
 col1, col2, col3 = st.columns(3)
@@ -65,10 +51,8 @@ col1, col2, col3 = st.columns(3)
 # Indicator for the calculated seniment score
 if sum(values) >= 14:
     col1.metric('Sentiment score', f'{(sum(values) * 5) - 5} %', 'Great')
-
 elif sum(values) >= 7:
     col1.metric('Sentiment score', f'{sum(values) * 5} %', 'Medium')
-
 else:
     col1.metric('Sentiment score', f'{sum(values) * 5} %', 'Bad')
 
@@ -84,6 +68,17 @@ col2.metric('Price prediction', f'{rounded_price} USD', round(delta, 2))
 week_price = ticker_df.Close[-5]
 week_delta = last_close - week_price
 col3.metric('Current Price', f'{rounded_last_close} USD', round(week_delta, 2))
+
+# Plot with ploly
+fig = go.Figure(data=go.Ohlc(x=ticker_df.index,
+                    open=ticker_df['Open'],
+                    high=ticker_df['High'],
+                    low=ticker_df['Low'],
+                    close=ticker_df['Close'],
+                    increasing_line_color= 'lightgreen', 
+                    decreasing_line_color= 'lightcoral'))
+
+st.plotly_chart(fig, use_container_width=True)
 
 # Print current news and sentiment
 st.subheader('Current news and sentiments')

@@ -5,14 +5,43 @@ import numpy as np
 import pandas as pd
 import xgboost as xgb
 import yfinance as yf
-import pickle
-import time
+import datetime
 
+from operator import attrgetter
 from xgboost import plot_importance, plot_tree
 
-def predict_price(ticker):
-    try:
+def relative_strength_idx(df, n=14):
+    '''
+    Function to calculate the relative strenght index (RSI). The RSI indicates if a stock is overbought oder undersold.
 
+    Args:
+    - df: A pandas DataFrame of closing prices for a stock.
+    '''
+    close = df['Close']
+
+    delta = close.diff()
+    delta = delta[1:]
+
+    pricesUp = delta.copy()
+    pricesDown = delta.copy()
+    pricesUp[pricesUp < 0] = 0
+    pricesDown[pricesDown > 0] = 0
+
+    rollUp = pricesUp.rolling(n).mean()
+    rollDown = pricesDown.abs().rolling(n).mean()
+
+    rs = rollUp / rollDown
+    rsi = 100.0 - (100.0 / (1.0 + rs))
+    return rsi
+
+def predict_price(ticker):
+    '''
+    Uses extreme gradient boosting algorithm to predict the future price of a stock.
+
+    Args:
+    - ticker: name of the ticker of a company (e.g. MSFT, AAPL, etc.).
+    '''
+    try:
         # Load in Microsoft Stock Data 
         stock = yf.Ticker(ticker)
         history = stock.history(period='max', interval='1d')
@@ -22,7 +51,8 @@ def predict_price(ticker):
         df = pd.DataFrame(history)
         df.head()
 
-        df = df['2020-01-04':'2022-05-31']
+        today = datetime.datetime.today().strftime('%Y-%m-%d')
+        df = df['2020-01-04':today]
 
         df['EMA_9'] = df['Close'].ewm(9).mean().shift()
         df['SMA_5'] = df['Close'].rolling(5).mean().shift()
@@ -30,32 +60,19 @@ def predict_price(ticker):
         df['SMA_15'] = df['Close'].rolling(15).mean().shift()
         df['SMA_30'] = df['Close'].rolling(30).mean().shift()
 
-        def relative_strength_idx(df, n=14):
-            close = df['Close']
-            delta = close.diff()
-            delta = delta[1:]
-            pricesUp = delta.copy()
-            pricesDown = delta.copy()
-            pricesUp[pricesUp < 0] = 0
-            pricesDown[pricesDown > 0] = 0
-            rollUp = pricesUp.rolling(n).mean()
-            rollDown = pricesDown.abs().rolling(n).mean()
-            rs = rollUp / rollDown
-            rsi = 100.0 - (100.0 / (1.0 + rs))
-            return rsi
-
         df['RSI'] = relative_strength_idx(df).fillna(0)
 
         EMA_12 = pd.Series(df['Close'].ewm(span=12, min_periods=12).mean())
         EMA_26 = pd.Series(df['Close'].ewm(span=26, min_periods=26).mean())
+
         df['MACD'] = pd.Series(EMA_12 - EMA_26)
         df['MACD_signal'] = pd.Series(df.MACD.ewm(span=9, min_periods=9).mean())
-
         df['Close'] = df['Close'].shift(-1)
-
-        df = df.iloc[33:] # Because of moving averages and MACD line
-        df = df[:-1]      # Because of shifting close price
-
+    
+        # Moving averages and MACD line
+        df = df.iloc[33:] 
+        # Shifting close price
+        df = df[:-1]      
         df.index = range(len(df))
 
         test_size  = 0.10
@@ -83,17 +100,20 @@ def predict_price(ticker):
         y_test  = test_df['Close'].copy()
         X_test  = test_df.drop(['Close'], 1)
 
-        model = xgb.XGBRegressor(n_estimators=700, gamma=0.03, learning_rate=0.005, max_depth=12,
-                            random_state=42)
+        model = xgb.XGBRegressor(n_estimators=700, 
+            gamma=0.03, 
+            learning_rate=0.005, 
+            max_depth=12,
+            random_state=42
+        )
 
         model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
+
+        # Get last prediction
         last_prediction = y_pred[-1]
 
     except:
         pass
 
     return last_prediction
-
-imb_price = predict_price('IBM')
-print(round(imb_price, 2))

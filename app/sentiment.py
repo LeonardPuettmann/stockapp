@@ -11,6 +11,12 @@ model = AutoModelForSequenceClassification.from_pretrained('zhayunduo/roberta-ba
 
 # Function to get news from finwiz
 def get_news(ticker):
+    '''
+    Function to scrape news headlines from finviz, a site for finance news. Returns a list of headlines with the corresponding date.m 
+
+    Args:
+    - ticker: name of the ticker of a company (e.g. MSFT, AAPL, etc.).
+    '''
     finwiz_url = 'https://finviz.com/quote.ashx?t='
     news_tables = {}
 
@@ -50,6 +56,14 @@ def get_news(ticker):
     return (news_list, news_date)
 
 def get_sentiment(headlines, model, tokenizer):
+    '''
+    Takes in a list of headlines and uses a BERT model to get the sentiment of the headline.
+
+    Args:
+    - headlines: list of headline of stock news.
+    - model: already loaded bert model to get sentiments.
+    - tokenizer: already loaded bert model to tokenize the text inputs.
+    '''
     news_sentiment = []
     news_values = []
     for headline in headlines:
@@ -63,17 +77,3 @@ def get_sentiment(headlines, model, tokenizer):
             news_values.append(0)
 
     return (news_sentiment, news_values)
-
-
-
-ticker = 'AAPL'
-news, date = get_news(ticker)
-
-sentiment, values = get_sentiment(news, model, tokenizer)
-
-sentiment_df = pd.DataFrame({'Headline': news, 'Sentiment': sentiment})
-
-if sum(values) > 10:
-    print('Positive')
-else:
-    print('Negative')
