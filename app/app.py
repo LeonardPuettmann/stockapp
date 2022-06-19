@@ -85,6 +85,7 @@ st.subheader('Current news and sentiments')
 sentiment_df = pd.DataFrame({'Headline': news, 'Sentiment': sentiment})
 st.dataframe(sentiment_df, width=1000)
 
-####
-#st.write('---')
+# Mandatory warining 
+st.write('This site is no investment advice. Please do your own research before investing and be aware of the risks that come when investing into the stock market. \
+    information on this site may not be correct or out of date at times.')
 #st.write(tickerData.info)
